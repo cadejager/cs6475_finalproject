@@ -72,8 +72,8 @@ def main(args):
     print "\nResults:\n--------"
     if submission.feedback():
 
-        if submission.console():
-                print submission.console()
+        if 'message' in submission.feedback():
+            print submission.feedback()['message']
 
         timestamp = "{:%Y-%m-%d-%H-%M-%S}".format(datetime.datetime.now())
         filename = "%s-result-%s.json" % (args.quiz, timestamp)
