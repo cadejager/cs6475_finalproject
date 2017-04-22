@@ -1,0 +1,8 @@
+Title: Palette Recolorization
+
+Description:
+I would like to write a program which can identify palettes in an image and then you can optimally change the color of them. I intend to do this with two passes. The first pass would generate a histogram of the image and then would either automatically identify the pallets based on spikes in the image colors. In the second pass the user could identify what colors to change the pallets to.
+
+Links:
+http://www.cs.princeton.edu/~huiwenc/pub/sig2015-palette.pdf
+
