@@ -60,17 +60,15 @@ def hueHist(image):
 
     return outhst
 
-def changeHue(image, inHue, outHue, width=22):
+def changeHue(image, huePairs, width=22):
     """This function changes the hue in the image
 
     Parameters
     ----------
     image : numpy.ndarray
         An image
-    inHue : int
-        The hue to change
-    outHue : int
-        The hue to change to
+    huePairs : (int, int)[]
+        The converion to due to the hues
     width : 
         The width of the hue
 
@@ -83,17 +81,19 @@ def changeHue(image, inHue, outHue, width=22):
 
     for row in hsv:
         for pix in row:
-            dst = abs(int(inHue)-pix[0])
-            if dst >= 180:
-                dst = 180 - dst
-            if dst < width/2:
-                nh = outHue-inHue + pix[0]
-                if nh < 0:
-                    nh += 180
-                elif nh >= 180:
-                    nh -= 180
+            for hp in huePairs:
+                dst = abs(hp[0]-pix[0])
+                if dst >= 180:
+                    dst = 180 - dst
+                if dst < width/2:
+                    nh = hp[1]-hp[0] + pix[0]
+                    if nh < 0:
+                        nh += 180
+                    elif nh >= 180:
+                        nh -= 180
 
-                pix[0] = nh
+                    pix[0] = nh
+                    break
 
     return cv2.cvtColor(hsv, cv2.COLOR_HSV2BGR)
 

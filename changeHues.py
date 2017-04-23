@@ -20,8 +20,8 @@ if __name__ == "__main__":
     image = cv2.imread(sys.argv[1], cv2.IMREAD_COLOR)
 
     print "changing Hues"
-    image = fp.changeHue(image, 101, 145, width=30)
-    image = fp.changeHue(image, 28, 60, width=45)
+    #image = fp.changeHue(image, [(101, 145), (28, 60)], width=30)
+    image = fp.changeHue(image, [(101, 28), (28, 101)], width=30)
     #image = fp.changeHue(image, 8, 8+90)
 
     hls = cv2.cvtColor(image, cv2.COLOR_BGR2HLS)
