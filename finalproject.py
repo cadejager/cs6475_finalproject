@@ -60,7 +60,36 @@ def hueHist(image):
 
     return outhst
 
-def changeHue(image, huePairs, width=22):
+
+def genHueDiff(image, mask):
+    """This function finds differences between the image and the mask
+
+    Parameters
+    ----------
+    image : numpy.ndarray
+        An image
+    mask : numpy.ndarray
+        A mask
+
+    Returns
+    -------
+    [(int, int), ...]
+        The image with the hue changed
+    """
+
+    hsvImg = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+    hsvMsk = cv2.cvtColor(mask, cv2.COLOR_BGR2HSV)
+    hueDiff = []
+
+    for i in xrange(len(hsvImg)):
+        for j in xrange(len(hsvImg[0])):
+            if (hsvImg[i][j] != hsvMsk[i][j]).any():
+                hueDiff.append(((hsvImg[i][j][0], hsvImg[i][j][2]), (hsvMsk[i][j][0], hsvMsk[i][j][2])))
+
+    return list(set(hueDiff))
+
+
+def changeHue(image, tPairs, hwidth=22, vwidth=64):
     """This function changes the hue in the image
 
     Parameters
@@ -81,18 +110,29 @@ def changeHue(image, huePairs, width=22):
 
     for row in hsv:
         for pix in row:
-            for hp in huePairs:
-                dst = abs(hp[0]-pix[0])
-                if dst >= 180:
-                    dst = 180 - dst
-                if dst < width/2:
-                    nh = hp[1]-hp[0] + pix[0]
+            for tp in tPairs:
+                hdst = abs(int(tp[0][0])-pix[0])
+                if hdst >= 180:
+                    hdst = 180 - hdst
+                vdst = abs(int(tp[0][1])-pix[2])
+                if vdst >= 256:
+                    vdst = 256 - vdst
+                if hdst < hwidth/2 and vdst < vwidth/2:
+                    nh = int(tp[1][0])-tp[0][0] + pix[0]
                     if nh < 0:
                         nh += 180
                     elif nh >= 180:
                         nh -= 180
 
                     pix[0] = nh
+
+                    nv = int(tp[1][1])-tp[0][1] + pix[2]
+                    if nv < 0:
+                        nv = 0
+                    elif nv >= 256:
+                        nv = 255
+
+                    pix[2] = nv
                     break
 
     return cv2.cvtColor(hsv, cv2.COLOR_HSV2BGR)
