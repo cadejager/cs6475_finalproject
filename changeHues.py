@@ -25,10 +25,10 @@ if __name__ == "__main__":
     print "hue changes " + str(hd)
 
     print "changing Hues"
-    #image = fp.changeHue(image, hd)
-    image = fp.changeHV(image, hd)
-    #image = fp.changeHue(image, [(101, 28), (28, 101)], width=30)
-    #image = fp.changeHue(image, 8, 8+90)
+    #image = fp.changeHV(image, hd)
+
+    #hu = [((9, 0, 0), (9+90, 0, 0)), ((102, 0, 0), (60, 0, 0))]
+    image = fp.changeHue(image, hd)
 
     print "writing image"
     cv2.imwrite(sys.argv[3], image)

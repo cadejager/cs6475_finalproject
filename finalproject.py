@@ -169,7 +169,7 @@ def changeHV(image, tPairs, hwidth=18, swidth=128, vwidth=128):
     return cv2.cvtColor(hsv, cv2.COLOR_HSV2BGR)
 
 
-def changeHue(image, tPairs, hwidth=22, vwidth=256):
+def changeHue(image, tPairs, hwidth=18, vwidth=512):
     """This function changes the hue in the image
 
     Parameters
@@ -218,7 +218,7 @@ def changeHue(image, tPairs, hwidth=22, vwidth=256):
 
     return cv2.cvtColor(hsv, cv2.COLOR_HSV2BGR)
 
-def histCenters(hueHst, width=22):
+def histCenters(hueHst, width=18):
     """This function finds the best color centers at the given hue width
 
     Parameters
