@@ -24,8 +24,9 @@ if __name__ == "__main__":
     hd = fp.genHueDiff(image, mask)
     print "hue changes " + str(hd)
 
-    #print "changing Hues"
-    image = fp.changeHue(image, hd, vwidth=196)
+    print "changing Hues"
+    #image = fp.changeHue(image, hd)
+    image = fp.changeHV(image, hd)
     #image = fp.changeHue(image, [(101, 28), (28, 101)], width=30)
     #image = fp.changeHue(image, 8, 8+90)
 

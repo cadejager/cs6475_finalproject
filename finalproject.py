@@ -84,12 +84,92 @@ def genHueDiff(image, mask):
     for i in xrange(len(hsvImg)):
         for j in xrange(len(hsvImg[0])):
             if (hsvImg[i][j] != hsvMsk[i][j]).any():
-                hueDiff.append(((hsvImg[i][j][0], hsvImg[i][j][2]), (hsvMsk[i][j][0], hsvMsk[i][j][2])))
+                hueDiff.append(((hsvImg[i][j][0], hsvImg[i][j][1], hsvImg[i][j][2]), (hsvMsk[i][j][0], hsvMsk[i][j][1], hsvMsk[i][j][2]), (i,j)))
 
     return list(set(hueDiff))
 
+def changeHVPos(hsvImg, imgMark, tp, pos, hwidth, swidth, vwidth, stack):
+    """Chanes the hue and value starting at at the given position
 
-def changeHue(image, tPairs, hwidth=22, vwidth=64):
+    Parameters
+    ----------
+    hsvImg : numpy.ndarray
+        An image
+    imgMark : numpy.ndarry (np.bool)
+        marks the spaces overwritten
+    trans : translation tuple
+    pos : The position
+
+    """
+
+    # check to see if the spot has been checked or is out of bounds
+    if pos[0] < 0 or pos[0] >= len(hsvImg) or pos[1] < 0 or pos[1] >= len(hsvImg[0]) or imgMark[pos[0]][pos[1]]:
+        return
+
+    pix = hsvImg[pos[0]][pos[1]]
+
+    hdst = abs(int(tp[0][0])-pix[0])
+    if hdst >= 180:
+        hdst = 180 - hdst
+    sdst = abs(int(tp[0][1])-pix[1])
+    if sdst >= 256:
+        sdst = 256 - sdst
+    vdst = abs(int(tp[0][2])-pix[2])
+    if vdst >= 256:
+        vdst = 256 - vdst
+
+    if hdst < hwidth/2 and sdst < swidth/2 and vdst < vwidth/2:
+        nh = int(tp[1][0])-tp[0][0] + pix[0]
+        if nh < 0:
+            nh += 180
+        elif nh >= 180:
+            nh -= 180
+        pix[0] = nh
+
+        #nv = int(tp[1][2])-tp[0][2] + pix[2]
+        #if nv < 0:
+        #    nv = 0
+        #elif nv >= 256:
+        #    nv = 255
+        #pix[2] = nv
+
+        imgMark[pos[0]][pos[1]] = True
+        stack.append((pos[0]+1, pos[1]))
+        stack.append((pos[0]-1, pos[1]))
+        stack.append((pos[0], pos[1]+1))
+        stack.append((pos[0], pos[1]-1))
+
+
+def changeHV(image, tPairs, hwidth=18, swidth=128, vwidth=128):
+    """This function changes the hue and value in the image starting at the given point
+
+    Parameters
+    ----------
+    image : numpy.ndarray
+        An image
+    huePairs : (int, int)[]
+        The converion to due to the hues
+    width : 
+        The width of the hue
+
+    Returns
+    -------
+    numpy.ndarray
+        The image with the hue changed
+    """
+    hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+    im = np.full((len(image), len(image[0])), False, dtype=bool)
+
+    for tp in tPairs:
+        st = []
+        st.append(tp[2])
+        while 0 != len(st):
+            changeHVPos(hsv, im, tp, st.pop(), hwidth, swidth, vwidth, st)
+
+    return cv2.cvtColor(hsv, cv2.COLOR_HSV2BGR)
+
+
+def changeHue(image, tPairs, hwidth=22, vwidth=256):
     """This function changes the hue in the image
 
     Parameters
@@ -108,13 +188,14 @@ def changeHue(image, tPairs, hwidth=22, vwidth=64):
     """
     hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 
+
     for row in hsv:
         for pix in row:
             for tp in tPairs:
                 hdst = abs(int(tp[0][0])-pix[0])
                 if hdst >= 180:
                     hdst = 180 - hdst
-                vdst = abs(int(tp[0][1])-pix[2])
+                vdst = abs(int(tp[0][2])-pix[2])
                 if vdst >= 256:
                     vdst = 256 - vdst
                 if hdst < hwidth/2 and vdst < vwidth/2:
@@ -126,13 +207,13 @@ def changeHue(image, tPairs, hwidth=22, vwidth=64):
 
                     pix[0] = nh
 
-                    nv = int(tp[1][1])-tp[0][1] + pix[2]
-                    if nv < 0:
-                        nv = 0
-                    elif nv >= 256:
-                        nv = 255
+                    #nv = int(tp[1][1])-tp[0][1] + pix[2]
+                    #if nv < 0:
+                    #    nv = 0
+                    #elif nv >= 256:
+                    #    nv = 255
 
-                    pix[2] = nv
+                    #pix[2] = nv
                     break
 
     return cv2.cvtColor(hsv, cv2.COLOR_HSV2BGR)
